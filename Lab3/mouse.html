@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Canvas</title>
+
+    <style type="text/css">
+      canvas {
+        border: 1px solid grey; 
+      }
+    </style>
+
+  </head>
+
+  <body>
+	<p>This is a paragraph.</p>
+
+    <canvas id="canvasForBall" width="600" height="500"></canvas>
+
+    <script type="text/javascript">
+		//var noClicks = 0;
+			
+		// Gets a handle to the element with id canvasOne.
+		var canvas = document.getElementById("canvasForBall");
+		// Get a 2D context for the canvas.
+		var ctx = canvas.getContext("2d");
+
+		// Make the fill style red.
+		ctx.fillStyle = "rgb(255, 0, 0)";
+
+		// event listener for a mouse click
+		canvas.addEventListener("click", function(event) { 
+			var mousePos = canvasPosition(canvas, event);
+			ctx.beginPath();
+			ctx.arc(mousePos.x, mousePos.y, 6, 0, 2 * Math.PI);
+
+			ctx.fill();
+
+			//noClicks += 1;
+			console.log(mousePos.x +" | "+ mousePos.y);
+		});
+
+		function canvasPosition(canvas, event){
+			return {
+				// event.clientX and event.clientY are the global coordinates of x and y
+				// canvas.offsetLeft and canvas.offsetTop are the canvas corrdinates of x and y
+				// take the difference between the global mouse position and the Canvas position to get the origin (0,0) at the top left of the Canvas element
+				x: event.clientX - canvas.offsetLeft,
+				y: event.clientY - canvas.offsetTop
+			};
+		}
+    </script>
+
+  </body>
+
+</html>

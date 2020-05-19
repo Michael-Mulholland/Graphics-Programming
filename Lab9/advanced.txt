@@ -1,0 +1,14 @@
+PART 1
+for loop/if in python
+
+iterate over every pixel with nested for loops
+
+if less the 250 = set to 0
+if greater than 250 = set to 255
+
+PART 2
+look at notes
+use first derivative
+
+subtract index
+img[i+1] - img[i]

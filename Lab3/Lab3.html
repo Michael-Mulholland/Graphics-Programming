@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+
+  <head> 
+    <meta charset="UTF-8">
+    <title>Canvas</title>
+
+    <style type="text/css">
+      body {
+          background-color: white;
+      }
+    </style>
+ 
+  </head>
+
+  <body>
+	
+	<!-- Name and Student ID -->
+	<h1>Michael Mulholland - G00362383</h1>
+
+	<!-- canvas container with width, height and border style-->
+    <canvas id="canvasForBall" width="600" height="500"  style="border: 1px solid black;"></canvas>
+
+    <script type="text/javascript">
+		// Gets a handle to the element with id canvasOne.
+		var canvas = document.getElementById("canvasForBall");
+	  
+		// Get a 2D context for the canvas.
+		var ctx = canvas.getContext("2d");
+	  			
+		// Add a Javascript event listener to the keypress event.
+		window.addEventListener("keydown", function(event) { 
+			// Just log the event to the console.
+			console.log(event);
+		});
+		
+		// Ball class
+		class Ball{
+			// class variables
+			rotate = 0.0;
+			rotateSpeed = 1;
+			
+			// class constructor
+			constructor(xPos, yPos, radius, xVelocity, yVelocity, colour, mass){
+				this.xPos = xPos;
+				this.yPos = yPos;
+				this.radius = radius;
+				this.xVelocity = xVelocity;
+				this.yVelocity = yVelocity;
+				this.colour = colour;
+				this.mass = mass;
+			}
+					
+			draw(){
+				ctx.lineWidth = 5;
+
+				// Draw the ball (stroked, not filled).
+				ctx.beginPath();
+				ctx.arc(this.xPos, this.yPos, this.radius, 0, 2 * Math.PI);
+				ctx.fillStyle = this.colour;
+				ctx.fill();
+				
+				ctx.moveTo(this.xPos, this.yPos); // moves ctx to the center of the circle
+				this.x = this.radius * (Math.cos(3/2 * Math.PI + this.rotate)) + this.xPos; // Polar to Cartesian Coordinates of x
+				this.y = this.radius * (Math.sin(3/2 * Math.PI + this.rotate)) + this.yPos; // Polar to Cartesian Coordinates of y
+				ctx.lineTo(this.x, this.y); // draws line from the center of the circle to one and a half PI
+				
+				ctx.moveTo(this.xPos, this.yPos); // moves ctx to the center of the circle
+				this.x = this.radius * (Math.cos(Math.PI/2 + this.rotate)) + this.xPos;
+				this.y = this.radius * (Math.sin(Math.PI/2 + this.rotate)) + this.yPos;
+				ctx.lineTo(this.x, this.y); // draws line from the center of the circle to a half PI
+				
+				ctx.moveTo(this.xPos, this.yPos); // moves ctx to the center of the circle
+				this.x = this.radius * (Math.cos(Math.PI/4 + this.rotate)) + this.xPos;
+				this.y = this.radius * (Math.sin(Math.PI/4 + this.rotate)) + this.yPos;
+				ctx.lineTo(this.x, this.y); // draws line from the center of the circle to one quater PI
+				
+				ctx.moveTo(this.xPos, this.yPos); // moves ctx to the center of the circle
+				this.x = this.radius * (Math.cos(Math.PI * (3/4) + this.rotate)) + this.xPos;
+				this.y = this.radius * (Math.sin(Math.PI * (3/4) + this.rotate)) + this.yPos;
+				ctx.lineTo(this.x, this.y); // draws line from the center of the circle to three quaters of a half PI
+			
+				ctx.stroke();							
+			}// draw()
+			
+			// makes the ball rotate in the oposite direction when it hits the canvas
+			rotateBall(spin){
+				if(this.rotateSpeed == 1){
+					// adds 0.05 to the rotation speed every time the ball its the Left or Right side of the canvas
+					this.rotate += spin;
+				}
+				else{
+					// subtracts 0.05 to the rotation speed every time the ball its the Top or Bottom of the canvas
+					this.rotate -= spin;
+				}
+			}// rotateBall()
+			
+			move(){
+				if(this.xPos  <  this.radius){
+					this.xVelocity = this.xVelocity * -1;
+					this.rotateSpeed *= -1;
+				}
+				else if(this.xPos + this.radius >= canvasForBall.width){
+					this.xVelocity = this.xVelocity * -1;
+					this.rotateSpeed *= -1;
+				}
+				if(this.yPos < this.radius ){
+					this.yVelocity = this.yVelocity * -1;
+					this.rotateSpeed *= -1;
+				}
+				else if(this.yPos + this.radius >= canvasForBall.height){
+					this.yVelocity = this.yVelocity * -1;
+					this.rotateSpeed *= -1;
+				}
+				
+				// Update the y location.
+				this.yPos += this.yVelocity;
+				this.xPos += this.xVelocity;
+			}// move()
+			
+			gravity(){
+				var fraction = 1;
+				var gravity = 0.9;
+			
+				if(this.yPos + this.radius > canvasForBall.height - 5){
+					this.yVelocity = - this.yVelocity * gravity;
+				}					
+
+				else {
+
+					this.yVelocity += fraction;
+				}
+
+				this.yPos += this.yVelocity;
+				//this.xPos += this.xVelocity;
+			}
+			
+		}//Ball class
+				
+		// create objects
+		// xPos, yPos , radius, xVelocity, yVelocity
+		var ball1 = new Ball(200, 50, 30, 4, 5, "red", 1);
+		var ball2 = new Ball(80, 50, 40, 5, 3, "blue", 2);
+		var ball3 = new Ball(400, 150, 35, 0, 6, "green", 3);
+
+		//keydown with jQuery
+		$(document.body).on('keydown', function(e) {	
+			// if statement to log which key has been pressed down
+			console.log(e.which);			
+			switch(e.which){
+				case 65:
+					ball1.xVelocity --;
+					break;
+				case 87:
+					ball1.yVelocity --;
+					break;
+				case 68:
+					ball1.xVelocity ++;
+					break;
+				case 83:
+					ball1.yVelocity ++;
+					break;		
+				case 82:
+					ball1.rotate += 0.5;;
+					break;	
+				case 84:
+					ball1.rotate -= 0.5;;
+					break;						
+			}
+				
+		});
+		
+		// event listener for a double click
+		canvas.addEventListener("dblclick", function(event) { 
+			var mousePos = canvasPosition(canvas, event);
+			ball1.xPos = mousePos.x;
+			ball1.yPos = mousePos.y;
+		});
+		
+		function canvasPosition(canvas, event){
+			return {
+				// event.clientX and event.clientY are the global coordinates of x and y
+				// canvas.offsetLeft and canvas.offsetTop are the canvas corrdinates of x and y
+				// take the difference between the global mouse position and the Canvas position to get the origin (0,0) at the top left of the Canvas element
+				x: event.clientX - canvas.offsetLeft,
+				y: event.clientY - canvas.offsetTop
+			};
+		}
+		
+		// A function to repeat every time the animation loops.
+		function repeatme() {
+			// clears the entire canvas
+			ctx.clearRect(0, 0, canvasForBall.width, canvasForBall.height);
+		
+			// Creates Object 1 - ball1 
+			// draws ball
+			// moves the ball
+			// rotates the ball
+			// the same goes for every Object
+			ball1.draw();
+			ball1.move();
+			ball1.rotateBall(0.05);
+			//ball1.gravity();
+
+			ball2.draw();
+			ball2.move();
+			ball2.rotateBall(0.09);
+			//ball2.gravity();
+
+			ball3.draw();
+			ball3.rotateBall(0.07);
+			ball3.gravity();			
+						
+			// never stops - infinite loop
+			window.requestAnimationFrame(repeatme);
+			// any code below window.requestAnimationFrame(repeatme);
+			// will not be run - Within repeatme function
+		}
+		
+		// Get the animation going.
+		repeatme();
+		
+    </script>
+
+  </body>
+
+</html>

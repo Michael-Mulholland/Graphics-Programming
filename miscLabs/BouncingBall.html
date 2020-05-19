@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head> 
+    <meta charset="UTF-8">
+    <title>Canvas</title>
+
+    <style type="text/css">
+      body {
+          background-color: white;
+      }
+    </style>
+ 
+  </head>
+
+  <body>
+  
+  	<!-- paragraph to display error message if the browser does not support the <canvas> HTML element  -->
+	<p id="errorMessage"></p>
+	
+	<h1>Michael Mulholland</h1>
+
+    <canvas id="canvasForBall" width="800" height="500"  style="border: 1px solid black;"></canvas>
+
+    <script type="text/javascript">
+		// Gets a handle to the element with id canvasOne.
+		var canvas = document.getElementById("canvasForBall");
+	  
+	  	// if statement to check if the browser supports the <canvas> HTML element
+		if(canvas.getContext){
+			// Get a 2D context for the canvas.
+			var ctx = canvas.getContext("2d");
+		  
+			// The vertical location of the ball.
+			var y = 120;
+			var x = 50;
+			var xVelocity = 5;
+			var yVelocity = 5;
+			var radius = 30;
+			
+			// A function to repeat every time the animation loops.
+			function repeatme() {
+		  		
+				ctx.clearRect(0, 0, canvasForBall.width, canvasForBall.height); // clears the entire canvas
+
+				// Draw the ball (stroked, not filled).
+				ctx.beginPath();
+				ctx.arc(x, y, radius, 0, 2 * Math.PI);
+				ctx.fillStyle = "red";
+				ctx.fill();
+				ctx.stroke();
+				
+				if(x + radius > canvasForBall.width || x - radius < 0){
+					xVelocity =- xVelocity;
+				}
+				if(y + radius > canvasForBall.height || y - radius < 0){
+					//console.log(y);
+					yVelocity =- yVelocity;
+					//console.log(yVelocity);
+				}
+					
+				// Update the y location.
+				y += yVelocity;
+				x += xVelocity;
+
+				// never stops - infinite loop
+				window.requestAnimationFrame(repeatme);
+				// any code below window.requestAnimationFrame(repeatme);
+				// will not be run
+			}
+		  
+			// Get the animation going.
+			repeatme();
+		}
+		else{
+	  		// output error message if the browser does not support the <canvas> HTML element
+			document.getElementById("errorMessage").innerHTML = "browser does not support canvas";
+		}
+	  
+    </script>
+
+  </body>
+
+</html>

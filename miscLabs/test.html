@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html>
+
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+  <head>
+    <meta charset="UTF-8">
+    <title>Canvas</title>
+
+    <style type="text/css">
+		canvas {
+			border: 1px solid grey; 
+		}
+    </style>
+
+  </head>
+
+  <body>
+
+    <canvas id="canvas-for-ball"></canvas>
+
+    <script type="text/javascript">
+	    var noClicks = 0;
+
+		var canvasWeight = 800, canvasHeight = 650;
+		// Gets a handle to the element with id canvasOne.
+		var canvas = document.getElementById("canvas-for-ball");
+		// Get a 2D context for the canvas.
+		var ctx = canvas.getContext("2d");
+		// Make the fill style red.
+		ctx.fillStyle = "rgb(255, 0, 0)";
+		canvas.width = canvasWeight;
+		canvas.height = canvasHeight;
+		var color = "#0095DD"
+		
+class Ball {
+		X;
+		Y;
+		deltaX;
+		deltaY;
+		radius;
+		
+		
+
+		//x, y, x velocity, y velocity, radius, colour, mass
+		constructor(x, y, xV, yV, r,  m) {
+			this.radius = r;
+			this.X = x;
+			this.Y= y;
+			this.deltaY= yV;
+			this.deltaX= xV;
+			
+			this.mass = m;
+			
+		}
+		
+		
+		draw()
+		{
+			ctx.beginPath();
+			ctx.arc(this.X, this.Y, this.radius, 0, 2 * Math.PI);
+			ctx.fillStyle = this.col;
+			ctx.fill();
+			ctx.stroke();			
+			ctx.beginPath();
+			ctx.moveTo(this.X,this.Y);
+			ctx.lineTo(this.X,this.Y+this.radius);
+			ctx.lineTo(this.X,this.Y-this.radius);
+			ctx.moveTo(this.X,this.Y);
+			ctx.arc(this.X, this.Y, this.radius, Math.PI*1/4, Math.PI*3/4 ,true);
+			ctx.fillStyle = color;			
+			ctx.closePath();
+			ctx.lineWidth = 3;
+			ctx.strokeStyle = 'orange';
+			ctx.stroke();
+			
+		}
+		
+		fall(){
+			ctx.clearRect(0, 0 , canvasWeight, canvasHeight);			
+			b.draw();
+			b2.draw();
+
+		  // if - check if ball is within canvas dimensions
+          if (this.Y > canvasHeight - this.radius - 1) {
+            this.deltaY = this.deltaY * -1; 
+			//this.Y = canvasHeight - this.radius;            
+			
+          }
+          else if (this.Y < this.radius + 1) {
+            this.deltaY = this.deltaY * -1; 
+			//this.Y = this.radius;            
+
+          }
+
+          if (this.X > canvasWeight - this.radius - 1) {
+            this.deltaX = this.deltaX * -1;   
+			//this.X = this.radius;            
+			
+          }
+          else if (this.X < this.radius + 1) {
+            this.deltaX = this.deltaX * -1;
+			//this.X = canvasWeight - this.radius;            
+          }		  
+		  
+		  /*
+		  if (this.X+ this.deltaX > canvas.width - this.radius || this.X + this.deltaX < this.radius) {
+			this.deltaX = -this.deltaX;
+		  }
+		  if (this.Y + this.deltaY > canvas.height - this.radius || this.Y + this.deltaY < this.radius) {
+			this.deltaY = -this.deltaY;
+		  }*/
+          //Updating the Position and Velocity of Ball Everytime
+		  //Add +1 for the ball to exceed the wall
+		  //Future game idea
+          this.Y += this.deltaY;
+          this.X += this.deltaX;          
+		}	
+	}
+	
+	// Creating Ball Object with x Position, y Posit, X Velocity, Y Velocity, Radius, Colour, Mass
+	b = new Ball(200,100,10,10,40, 90);
+	b2 = new Ball(200,200,8,15,50, 90);
+		
+	// Add a Javascript event listener to the keypress event.
+		window.addEventListener("keypress", function(event) { 
+			// Just log the event to the console.
+			console.log(event);
+			
+		});
+
+		//keypresses with jQuery
+		$(document.body).on('keydown', function(e) {
+			console.log(e.which);
+			switch (e.which) {
+			// key code for left arrow
+			case 65://A
+				console.log('left arrow key pressed!');
+				b.deltaX -= 0.2; 
+				break;
+
+			case 68://D
+				console.log('right arrow key pressed!');
+				b.deltaX += 0.2;
+				break;
+				
+			case 83://S
+				console.log('Down arrow key pressed!');
+				b.deltaY += 0.2;
+				break;
+						
+			case 87://W
+				console.log('Up arrow key pressed!');
+				b.deltaY -= 0.2;
+				break;
+			}
+			
+			
+		});
+	
+	canvas.addEventListener('dblclick', function(e) { 
+		b.X = e.pageX;
+		b.Y = e.pageY;
+		});
+	
+	
+    function collison(){
+		var dx = (b.X) - (b2.X );
+		var dy = (b.Y) - (b2.Y );
+		var distance = Math.sqrt(dx * dx + dy * dy);
+    
+		if (distance <= b.radius + b2.radius) {
+			// collision detected!
+			//this.col = "green";
+			collideBalls(b,b2);
+			console.log("Crash");
+			ctx.font = "30px Arial Bold";
+			ctx.fillStyle = "rgb(255,0,255)";
+			ctx.fillText("Collision Detected", 250, 250);
+			color = "#" + ((1 << 24) * Math.random() | 0).toString(16);
+
+		} 
+		else {
+
+		} 
+	}
+
+
+	function collideBalls(ball1, ball2) {
+      var dx = ball1.X - ball2.X;
+      var dy = ball1.Y - ball2.Y;
+      var collisionAngle = Math.atan2(dy, dx);
+      
+      // Get velocities of each ball before collision
+      var speed1 = Math.sqrt(ball1.deltaX * ball1.deltaX + ball1.deltaY * ball1.deltaY);
+      var speed2 = Math.sqrt(ball2.deltaX * ball2.deltaX + ball2.deltaY * ball2.deltaY);
+      
+      // Get angles (in radians) for each ball, given current velocities
+      var direction1 = Math.atan2(ball1.deltaY, ball1.deltaX);
+      var direction2 = Math.atan2(ball2.deltaY, ball2.deltaX);
+      
+      // Rotate velocity vectors so we can plug into equation for conservation of momentum
+      var rotateddeltaX1 = speed1 * Math.cos(direction1 - collisionAngle);
+      var rotateddeltaY1 = speed1 * Math.sin(direction1 - collisionAngle);
+      var rotateddeltaX2 = speed2 * Math.cos(direction2 - collisionAngle);
+      var rotateddeltaY2 = speed2 * Math.sin(direction2 - collisionAngle);
+      
+      // Update actual velocities using conservation of momentum
+      /* Uses the following formulas:
+           velocity1 = ((mass1 - mass2) * velocity1 + 2*mass2 * velocity2) / (mass1 + mass2)
+           velocity2 = ((mass2 - mass1) * velocity2 + 2*mass1 * velocity1) / (mass1 + mass2)
+      */
+      var finaldeltaX1 = ((ball1.mass - ball2.mass) * rotateddeltaX1 + (ball2.mass + ball2.mass) * rotateddeltaX2) / (ball1.mass + ball2.mass);
+      var finaldeltaX2 = ((ball1.mass + ball1.mass) * rotateddeltaX1 + (ball2.mass - ball1.mass) * rotateddeltaX2) / (ball1.mass + ball2.mass);
+      
+      // Y velocities remain constant
+      var finaldeltaY1 = rotateddeltaY1;
+      var finaldeltaY2 = rotateddeltaY2;
+      
+      // Rotate angles back again so the collision angle is preserved
+      ball1.deltaX = Math.cos(collisionAngle) * finaldeltaX1 + Math.cos(collisionAngle + Math.PI/2) * finaldeltaY1;
+      ball1.deltaY = Math.sin(collisionAngle) * finaldeltaX1 + Math.sin(collisionAngle + Math.PI/2) * finaldeltaY1;
+      ball2.deltaX = Math.cos(collisionAngle) * finaldeltaX2 + Math.cos(collisionAngle + Math.PI/2) * finaldeltaY2;
+      ball2.deltaY = Math.sin(collisionAngle) * finaldeltaX2 + Math.sin(collisionAngle + Math.PI/2) * finaldeltaY2;
+      
+      // Update nextX and nextY for both balls so we can use them in render() or another collision
+      ball1.X += ball1.deltaX;
+      ball1.Y += ball1.deltaY;
+      ball2.X += ball2.deltaX;
+      ball2.Y += ball2.deltaY;
+    }
+	
+	function repeatme(){	
+	b.fall();
+	b2.fall();		
+	collison();		
+	window.requestAnimationFrame(repeatme);	 
+	}
+	
+	repeatme();
+    </script>
+
+  </body>
+
+</html>

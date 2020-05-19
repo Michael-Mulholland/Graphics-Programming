@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head> 
+    <meta charset="UTF-8">
+    <title>Canvas</title>
+
+    <style type="text/css">
+      body {
+          background-color: white;
+      }
+    </style>
+ 
+  </head>
+
+  <body>
+	
+	<h1>Michael Mulholland</h1>
+
+    <canvas id="canvasForBall" width="600" height="500"  style="border: 1px solid black;"></canvas>
+
+    <script type="text/javascript">
+		// Gets a handle to the element with id canvasOne.
+		var canvas = document.getElementById("canvasForBall");
+	  
+
+			// Get a 2D context for the canvas.
+			var ctx = canvas.getContext("2d");
+		  
+			// The vertical location of the ball.
+			var xPos;
+			var yPos;
+			var radius;
+			var xVelocity = 5;
+			var yVelocity = 5;
+			var rotate = 0.00;
+			var rotateSpeed = 1;
+			
+			class Ball{
+				constructor(xPos, yPos, radius){
+					this.xPos = xPos;
+					this.yPos = yPos;
+					this.radius = radius;
+				}
+				
+				draw(){
+					ctx.lineWidth = 5;
+									
+					// Draw the ball (stroked, not filled).
+					ctx.beginPath();
+					ctx.arc(this.xPos, this.yPos, this.radius, 0, 2 * Math.PI);
+					ctx.fillStyle = "red";
+					ctx.fill();
+					
+					ctx.moveTo(this.xPos, this.yPos);
+					var x = this.radius * (Math.cos(3/2 * Math.PI + rotate)) + this.xPos;
+					var y = this.radius * (Math.sin(3/2 * Math.PI + rotate)) + this.yPos;
+					ctx.lineTo(x, y);
+					
+					ctx.moveTo(this.xPos, this.yPos);
+					var x = this.radius * (Math.cos(Math.PI/2 + rotate)) + this.xPos;
+					var y = this.radius * (Math.sin(Math.PI/2 + rotate)) + this.yPos;
+					ctx.lineTo(x, y);
+					
+					ctx.moveTo(this.xPos, this.yPos);
+					var x = this.radius * (Math.cos(Math.PI/4 + rotate)) + this.xPos;
+					var y = this.radius * (Math.sin(Math.PI/4 + rotate)) + this.yPos;
+					ctx.lineTo(x, y);
+					
+					ctx.moveTo(this.xPos, this.yPos);
+					var x = this.radius * (Math.cos(Math.PI * (3/4) + rotate)) + this.xPos;
+					var y = this.radius * (Math.sin(Math.PI * (3/4) + rotate)) + this.yPos;
+					ctx.lineTo(x, y);
+				
+					ctx.stroke();
+					
+					//this.rotate += this.rotateSpeed;					
+				}
+				
+				rotateBall(){
+					if(rotateSpeed == 1){
+						rotate += 0.05;
+					}
+					else{
+						rotate -= 0.05;
+					}
+				}
+				
+				move(){	
+					if(this.xPos + this.radius > canvasForBall.width || this.xPos - this.radius < 0){		
+						xVelocity =- xVelocity;
+						rotateSpeed =- rotateSpeed;
+					}
+					if(this.yPos + this.radius > canvasForBall.height || this.yPos - this.radius < 0){
+						yVelocity =- yVelocity;		
+						rotateSpeed = -rotateSpeed;						
+					}
+
+					// Update the x and y location.
+					this.xPos += xVelocity;
+					this.yPos += yVelocity;
+				}
+			}
+			
+			// A function to repeat every time the animation loops.
+			function repeatme() {
+				
+				ctx.clearRect(0, 0, canvasForBall.width, canvasForBall.height); // clears the entire canvas
+			
+				ball1.draw();
+				ball1.move();
+				ball1.rotateBall();
+						
+				// never stops - infinite loop
+				window.requestAnimationFrame(repeatme);
+				// any code below window.requestAnimationFrame(repeatme);
+				// will not be run
+			}
+			
+			var ball1 = new Ball(50, 50, 30);
+			//var ball2 = new Ball(150, 150, 40);
+
+			
+			// Get the animation going.
+			repeatme();
+		
+    </script>
+
+  </body>
+
+</html>

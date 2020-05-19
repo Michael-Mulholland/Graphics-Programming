@@ -1,0 +1,122 @@
+<!DOCTYPE html> 
+<html>   
+	<head>   
+
+		<!-- external scripts -->	
+		<script src="https://d3js.org/d3.v5.min.js"></script>	
+		<script src="http://code.jquery.com/jquery-3.1.0.min.js"></script>
+		
+		<title>D3.js Demo</title>     
+		<meta charset="UTF-8">     
+		<style type="text/css"></style>   
+	</head>   
+	<body>  
+
+		<script type="text/javascript">
+		 
+			// JSON GBP/EUR file
+			$.getJSON("https://jsonblob.com/api/12e1ecbf-fa29-11e9-a508-23acf101064c", function(data){
+				//console.log(data);
+				// plot the data
+				plotCurrencyData(data);
+			});
+		
+			// this function will execute once the JSON file is downloaded
+			function plotCurrencyData(data){
+			
+				// Setup the SVG size and margins
+				var margin = {top:80, right:80, bottom:80, left:80},
+				width = 900 - margin.left - margin.right,
+				height = 670 - margin.top - margin.bottom;
+				
+				var parseDate = d3.timeParse("%d/%m/%Y");
+				
+				// x scales for GBP/EUR - time (x-axis)
+				var x = d3.scaleTime()
+					.domain(d3.extent(data, function(d) { return parseDate(d["Date"]);}))			
+					.range([0,width]);
+					
+				// y scales for GBP/EUR - value (y-axis)
+				var y = d3.scaleLinear()
+					.domain(d3.extent(data, function(d) { return d["GBP/EUR"] }))
+					.range([height,0]);
+					
+				// x axis
+				var xAxis = d3.axisBottom(x)
+					.ticks(5);
+				
+				// y axis
+				var yAxis = d3.axisLeft(y)
+					.ticks(15);		
+
+				// d3.line object
+				var valueline = d3.line()
+					.x(function(d) { return x(parseDate(d["Date"]));})
+					.y(function(d) { return y(d["GBP/EUR"]);});
+					
+				// Append an SVG element to the webpage
+				var svg = d3.select('body')
+					.append("svg")
+						.attr("width", width + margin.left + margin.right)
+						.style("stroke", d3.color("red"))
+						.style("fill", d3.color("white"))
+						.attr("height", height + margin.top + margin.bottom)
+						
+					.append('g')
+						// Not necessary but adds offset so that numeric values are visible
+						.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+					
+				//  add x axis and the line object to the SVG element
+				// x axis on the bottom
+				svg.append('g')
+					.attr('class', 'x axis')
+					.attr("transform", "translate(0," + height + ")")
+					.call(xAxis)
+					.selectAll("text")
+						.style("text-anchor", "end")
+						.style("stroke", d3.color("steelblue"))
+						.attr("dx", "3em")
+						.attr("dy", "-.3em")
+						.attr("transform", "rotate(60)" );
+					
+				//  add y axis and the line object to the SVG element
+				// y axis on the left					
+				svg.append('g')
+					.attr('class', 'y axis')
+					.style("stroke", d3.color("steelblue"))
+					.call(yAxis);	
+	
+				// text label for the x axis	
+				svg.append('text')
+					.attr('x', width / 2)
+					.attr('y', 40)
+					.attr('text-anchor', 'middle')
+					.style("stroke", d3.color("black"))
+					.text(' GBP vs. EUR JSONP currency data ')
+				
+				// text label for the x axis	
+				svg.append("text")      
+					.attr("x", 400 )
+					.attr("y",  570)
+					.style("text-anchor", "middle")
+					.style("font-size", "26px")
+					.style("stroke", d3.color("black"))
+					.style("font-weight", "bold")
+					.text("Date");
+					
+				// text label for the y axis	
+				svg.append("text")    
+					.style("text-anchor", "middle")
+					.attr("y", "-2.2em")
+					.attr("transform", "translate(0," + (height/2) + ")rotate(-90)")
+					.style("stroke", d3.color("black"))
+					.style("font-size", "26px")
+					.text("GBP/EUR");
+
+				svg.append("path")
+					.attr("d", valueline(data));
+									
+			}
+		</script> 
+	</body> 
+</html>
